@@ -1,0 +1,82 @@
+---
+title: "DataGeneration"
+author: "Eric Massa"
+date: "1/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+R Markdown document "DataGeneration.Rmd" for BIOL 812 week 3 assignment. Each step is labelled with comments in the code below. Additional commentary is included as needed.
+
+Steps were as follows:
+
+
+1.    Create a new public repository on your GitHub account called USERNAME.github.io (but replace USERNAME with your own GitHub username). This will create a public website that anyone can access with a web browser, by entering USERNAME.github.io (it may take a few minutes to sync).
+2.    Now open RStudio and create a new project linked to your USERNAME.github.io directory. Be sure to use the repository website, not the public website link: i.e. http://github.com/USERNAME/USERNAME.github.io NOT http://USERNAME.github.io
+3.    Create a new Rmd script called DataGeneration.R Inside of DataGeneration.R
+4.    Create an object called Species that is a character vector containing the names of 10 species (you can use any species names you want)
+5.    Create a vector called Limb.Width that is a numeric vector containing 10 random numbers sampled from a normal distribution with a mean of 10 and standard deviation of 10.
+6.    Change any negative numbers in Limb.Width to positive values. Make sure this will work regardless of which random numbers are generated in 2a.
+7.    Create a vector called unitsW that is a boolean vector containing 10 strings that are either mm or cm generated randomly with a 0.5 probability of each
+8.    Repeat step 5 and 6 for a new object called Limb.Length, but with a mean and standard deviation of 100
+9.    Repeat step 7 for a new object called unitsL
+10.    Combine all vectors into a data.frame object called MyData
+11.    Save MyData as a csv file in the Data folder called measurements.csv
+
+
+```{r }
+#Part 1, steps 1-3 involve creation of repositories/files, not code
+#Part 1, step 4
+Species <- c("Ursus americanus","Ursus arctos","Ursus ursinus","Ursus maritimus","Ursus malayanus","Ursus thibetanus","Ursus deningeri","Ursus etruscus","Ursus minimus","Ursus rossicus")
+```
+
+## Start of data creation
+Create a vector of 10 species names.
+
+```{r }
+#Part 1, step 5
+Limb.Width <- rnorm(n = 10, mean = 10, sd = 10)
+#Part 1, step 6
+for (i in 1:length(Limb.Width)) {
+  if ((Limb.Width[i] < 0) == TRUE) {
+    Limb.Width[i] <- -1*Limb.Width[i]
+  }
+}
+```
+Generate 10 limb width values with a mean value of 10 and a standard deviation of 10.
+If a value is negative, multiply by -1 to make it positive.
+```{r }
+#Part 1, step 7
+unitsW <- sample(x = c("cm","mm"),size = 10, replace = TRUE, prob = c(0.5,0.5))
+```
+
+Randomly assign each limb width value a unit of either millimeters (mm) or centimeters (cm).
+
+```{r }
+#Part 1, step 8
+Limb.Length <- c(rnorm(n = 10, mean = 100, sd = 100))
+for (i in 1:length(Limb.Length)) {
+  if ((Limb.Length[i] < 0) == TRUE) {
+    Limb.Length[i] <- -1*Limb.Length[i]
+  }
+}
+#Part 1, step 9
+unitsL <- sample(x = c("cm","mm"),size = 10, replace = TRUE, prob = c(0.5,0.5))
+```
+
+Generate 10 limb length values with mean value of 100 and standard deviation of 100 and make sure that value is positive.
+Multiply by -1 to make it positive if needed.
+Randomly assign unit of either millimeters (mm) or centimeters (cm).
+
+```{r }
+#Part 1, step 10
+MyData <- data.frame(Species, Limb.Width, unitsW, Limb.Length, unitsL)
+#Part 1, step 11
+write.csv(MyData, file = "measurements.csv",row.names = FALSE)
+```
+Create dataframe of variables generated and save to "measurements.csv" file.

@@ -1,0 +1,127 @@
+---
+title: "DataAnalysis"
+author: "Eric Massa"
+date: "1/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+R Markdown document "DataGeneration.Rmd" for BIOL 812 week 3 assignment. Each step is labelled with comments in the code below. Additional commentary is found below as needed.
+
+Steps were as follows:
+
+1.    Read measurements.csv into an object in R called MData
+2.    Include functions from the Data Science Tutorial to do each of the following:
++    Change the column names to shorter, 3-letter abbreviations
++    Add a new data column called Volume that calculates limb volume (Hint: pay careful attention to your units – assume unitsW shows the units for Limb.Width and unitsL shows the units for Limb.Length). Treat these as limb dimensions (e.g. arms, legs, fins).
++    Group the species into 2 or more imaginary groups (you decide on the category names) and add a column denoting these groups
++    Summarize the mean and SD of Length, Width and Volume for each of your artificial groups, and present in table form.
++    Plot Width and Length, as in Part III from last week’s assignment BUT embed the graph in your R markdown file rather than creating a separate pdf.
++    Plot Width and Length, but only for species that have above-average volume
++    Add a table showing only Species and Volume for only the species with below-average volume
+3.    Add notes to your ‘official’ report.
+4.    Knit your Rmd file to a html format.
+5.    Save and upload your files to the corresponding GitHub repository (hint: review ‘commit’, ‘push’ and ‘pull’)
+6.    Submit a link to your GitHub repository to OnQ
+
+```{r}
+#Necessary libraries
+library(dplyr)
+library(ggplot2)
+```
+
+##Read data
+
+```{r }
+#Part 2, step 1
+MData <- read.csv("measurements.csv")
+```
+
+##Rename dataframe columns
+
+```{r }
+#Part 2, step 2, bullet 1
+MData2 <- rename(.data = MData, SPP = Species, LWD = Limb.Width, LLG = Limb.Length, UNW = unitsW, UNL = unitsL)
+```
+
+##Calculate limb volume
+First convert all limb dimensions into cm.
+Second, calculate limb volume in cm^3
+```{r }
+#Part 2, step 2, bullet 2
+cmL <- numeric()
+cmW <- numeric()
+for (i in 1:nrow(MData2)) {
+  if (MData2$UNL[i] == "mm") {
+    cmL[i] <- MData2$LLG[i]/10
+  } else {
+    cmL[i] <- MData2$LLG[i]
+  }
+}
+for (i in 1:nrow(MData2)) {
+  if (MData2$UNW[i] == "mm") {
+    cmW[i] <- MData2$LWD[i]/10
+  } else {
+    cmW[i] <- MData2$LWD[i]
+  }
+}
+vol <- numeric()
+for (i in 1:10) {
+  vol[i] <- pi * cmW[i]^2 * cmL[i]
+}
+```
+
+append volume data to imported dataset.
+
+```{r }
+MData3 <- mutate(MData2, Volume = vol)
+```
+
+## Data grouping and summary
+Arbitrary grouping of data into groups "A" and "B".
+Summarize limb data (length, width, and volume), presenting mean and standard deviation of each (in cm) by group.
+
+```{r }
+#Part 2, step 2, bullet 3
+MData4 <- mutate(MData3, Group = c(rep("A",5), rep("B",5)))
+#Part 2, step 2, bullet 4
+summarize(.data = group_by(MData4, Group), MeanL = mean(cmL), SDL = sd(cmL), MeanW = mean(cmW), SDW = sd(cmW), MeanV = mean(Volume), SDV = sd(Volume))
+```
+
+##Plots
+Plots demonstrating relationships in the data.
+The first plot demonstrates the relationship between limb length and limb width of all organisms in the data.
+```{r }
+#Part 2, step 2, bullet 5
+qplot(x = cmL, y = cmW, xlab = "Length of limb (cm)", ylab = "Width of limb (cm)")
+```
+
+The second plot demonstrates the same, but only for those species with limb volumes above average.
+
+```{r }
+#Part 2, step 2, bullet 6
+qplot(x = cmL[MData4$Volume > mean(MData4$Volume)], y = cmW[MData4$Volume > mean(MData4$Volume)], xlab = "Length of limb (cm)", ylab = "Width of limb (cm)")
+```
+
+Show species name and limb volume for species with below-average limb volume.
+
+```{r }
+#Part 2, step 2, bullet 7
+filter(.data = MData4[,c(1,6)], Volume < mean(MData4$Volume))
+
+
+#Part 2, step 3
+#...
+
+#Part 2, step 4
+#Knit to file, no code.
+#Part 2, step 5
+#Saving and uploading files to GitHub repository. No code.
+#Part 2, step 6
+#Submit to OnQ. No code.
+```
